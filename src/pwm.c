@@ -2,7 +2,6 @@
 #include "pwm.h"
 
 
-
 void timer0_init()
 {
     // Timer/Counter 0 initialization

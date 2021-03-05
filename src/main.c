@@ -1,22 +1,35 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <avr/delay.h>
+#include <avr/interrupt.h>
 
 #include "usart.h"
 #include "pwm.h"
+#include "ps2.h"
 
 uint8_t i = 0;
 unsigned j;
 int main(void)
 {
+	//External interrupts disable
+	EICRA = 0;
+    EICRA = 0; 
+    EIMSK = 0;
+    EIFR  = 0;
+	//Used ports disable
 	DDRB = 0;
 	PORTB = 0;
+	DDRD = 0;
+	PORTD = 0;
     USART1_init();
 	timer0_init();
+	ps2_init();
+
+	sei();
 
     while(1)
     {
-		/*
+		
 		for(j = 0; j < 20000/2; ++j)
 		{
 			_delay_us(2);
@@ -32,10 +45,15 @@ int main(void)
 			_delay_us(4);
 			OCR0 = i++;
 		}
-		*/
+		
 		/*scanf("%d",&i);
         printf("Read %d\r\n", i);*/
 		//printf("%u\r\n",TCNT0);
+		/*static uint8_t bold, dold;
+		if(bold != (PINB & 0b11101111) || dold != PIND)
+			printf("%02x -> %02x,%02x -> %02x\r\n",bold, PINB & 0b11101111,dold,PIND);
+		bold = PINB & 0b11101111;
+		dold = PIND;*/
     }
 
 }
