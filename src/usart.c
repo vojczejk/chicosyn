@@ -2,10 +2,10 @@
 
 void USART1_init()
 {
-		// Set baud rate
+	// Set baud rate
 	UBRR1H = 0;
-	UBRR1L = 16;
-	UCSR1A = (1<<U2X1);
+	UBRR1L = 1;
+	UCSR1A = 0;
 	// Enable receiver and transmitter
 	UCSR1B = (1<<RXEN1) | (1<<TXEN1);
 	// Set frame format

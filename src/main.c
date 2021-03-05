@@ -6,11 +6,15 @@
 #include "usart.h"
 #include "pwm.h"
 #include "ps2.h"
+#include "samplegen.h"
 
 uint8_t i = 0;
 unsigned j;
 int main(void)
 {
+	//Timer interrupt disable
+	TIMSK = 0;
+	ETIMSK = 0;
 	//External interrupts disable
 	EICRA = 0;
     EICRA = 0; 
@@ -24,6 +28,7 @@ int main(void)
     USART1_init();
 	timer0_init();
 	ps2_init();
+	sampletimer_init();
 
 	sei();
 
