@@ -1,7 +1,7 @@
 #include <avr/pgmspace.h>
 
 #include "oscillator.h"
-#include "note_lut.h"
+#include "lut.h"
 
 
 oscillator_t g_main_osc;
