@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "samplegen.h"
+#include "oscillator.h"
 
 void sampletimer_init()
 {
@@ -40,6 +41,7 @@ void sampletimer_init()
 
 ISR(TIMER1_COMPA_vect)
 {
-    static volatile uint8_t cnt = 0;
+    osc_step(&g_main_osc);
+	OCR0 = osc_out(&g_main_osc);
     //printf("%02x\r\n",cnt++);
 }

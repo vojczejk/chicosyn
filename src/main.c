@@ -1,12 +1,13 @@
 #include <avr/io.h>
 #include <stdio.h>
-#include <avr/delay.h>
+//#include <avr/delay.h>
 #include <avr/interrupt.h>
 
 #include "usart.h"
 #include "pwm.h"
 #include "ps2.h"
 #include "samplegen.h"
+#include "oscillator.h"
 
 uint8_t i = 0;
 unsigned j;
@@ -30,11 +31,17 @@ int main(void)
 	ps2_init();
 	sampletimer_init();
 
+	osc_init(&g_main_osc);
+	g_main_osc.enable = 1;
+
 	sei();
 
     while(1)
     {
-		
+		unsigned tmp;
+		scanf("%u",&tmp);
+		g_main_osc.note = (uint8_t)tmp;
+		/*
 		for(j = 0; j < 20000/2; ++j)
 		{
 			_delay_us(2);
@@ -50,7 +57,7 @@ int main(void)
 			_delay_us(4);
 			OCR0 = i++;
 		}
-		
+		*/
 		/*scanf("%d",&i);
         printf("Read %d\r\n", i);*/
 		//printf("%u\r\n",TCNT0);
