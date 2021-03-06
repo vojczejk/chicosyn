@@ -18,7 +18,7 @@ void osc_init(oscillator_t * osc)
 void osc_step(oscillator_t * osc)
 {
     if(osc->enable)
-        osc->count += ((uint32_t)pgm_read_word(&lut_notestep[osc->note]))<<16;
+        osc->count += ((uint32_t)pgm_read_dword(&lut_notestep[osc->note]));
     else
         osc->count = 0;
 }
@@ -26,7 +26,10 @@ void osc_step(oscillator_t * osc)
 uint8_t osc_out(oscillator_t * osc)
 {
     //Sine
-    return pgm_read_byte(&lut_sine[(uint8_t)((osc->count/2) >> 24)]);
+    if(osc->enable)
+        return pgm_read_byte(&lut_sine[(uint8_t)((osc->count) >> 24)]);
+    else
+        return 0x80;
     //Square
     //return ((uint8_t)((osc->count/2) >> 24) > 0x80) ? 255 : 0;
 }

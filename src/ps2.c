@@ -2,12 +2,12 @@
 #include "ps2.h"
 #include "oscillator.h"
 
-volatile uint8_t flag_process_scancode = 0;
 volatile uint8_t flag_in_escape_0 = 0;
 volatile uint8_t flag_in_release = 0;
-
-volatile uint8_t g_last_scancode = 0;
 volatile uint8_t g_left_to_ignore = 0;
+
+ring_buffer_t g_ps2_buf;
+
 
 ISR(INT1_vect)
 {
@@ -32,9 +32,8 @@ ISR(INT1_vect)
     {   
         if(--bitcount == 0)// All bits received
         {
-            //Report new scancode
-            g_last_scancode = data;
-            flag_process_scancode = 1;
+            if(!ring_buffer_is_full(&g_ps2_buf))
+                ring_buffer_queue(&g_ps2_buf,(char)data);
             //printf("scan %02x\r\n",g_last_scancode);
 
             bitcount = 11;
@@ -54,6 +53,8 @@ void ps2_init(void)
     EICRA &= ~(1<<ISC10);
     EIMSK |=(1<<INT1);
     EIFR  |=(1<<INTF1);
+
+    ring_buffer_init(&g_ps2_buf);
 }
 
 keys_t ps2_scan_translate(uint8_t scan_byte)
@@ -143,26 +144,27 @@ keys_t ps2_scan_translate(uint8_t scan_byte)
  
 void ps2_scancode_runner()
 {
-    //printf("process %u, last %02x, ignore %u, f0 %u, e0 %u\r\n",flag_process_scancode,g_last_scancode,g_left_to_ignore,flag_in_release,flag_in_escape_0);
-    if(!flag_process_scancode)
+    char tmp;
+    if(ring_buffer_is_empty(&g_ps2_buf))
         return;
 
     if(g_left_to_ignore > 0)
     {
         g_left_to_ignore--;
-        flag_process_scancode = 0;
+        ring_buffer_dequeue(&g_ps2_buf,&tmp);
         return;
     }
 
     if(flag_in_release) //f0 was previous code
     {
-        keys_t key = ps2_scan_translate(g_last_scancode);
+        ring_buffer_dequeue(&g_ps2_buf,&tmp);
+        keys_t key = ps2_scan_translate((uint8_t)tmp);
         //printf("release\r\n");
         if(key < LIMITER_KEY)
         {
-            //release a key
-            printf("R%u\r\n",key);
-            g_main_osc.enable = 0;
+            release_key((uint8_t)key);
+            //printf("R%u\r\n",key);
+            flag_update_osc = 1;
         }
         //nothing else needs releasing, just ignore
         flag_in_release = 0;
@@ -174,7 +176,8 @@ void ps2_scancode_runner()
     }
     else //Starting new scan code
     {
-        keys_t key = ps2_scan_translate(g_last_scancode);
+        ring_buffer_dequeue(&g_ps2_buf,&tmp);
+        keys_t key = ps2_scan_translate((uint8_t)tmp);
         if(key == KEY_E0)
             flag_in_escape_0 = 1;
         else if(key == KEY_END)
@@ -184,14 +187,13 @@ void ps2_scancode_runner()
         else if(key < LIMITER_KEY)
         {
             //play a note
-            printf("%u\r\n",key);
-            g_main_osc.enable = 1;
-		    g_main_osc.note = (uint8_t)key + 60-12;
+            play_key((uint8_t)key);
+            flag_update_osc = 1;
+            //printf("%u\r\n",key);
         }
         else if(key < LIMITER_ACTION)
         {
             //do things! 
         }
     }
-    flag_process_scancode = 0; //clear process flag
 }

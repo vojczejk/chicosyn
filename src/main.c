@@ -33,7 +33,7 @@ int main(void)
 	sampletimer_init();
 
 	osc_init(&g_main_osc);
-	g_main_osc.enable = 1;
+	g_main_osc.enable = 0;
 
 	sei();
 
@@ -45,7 +45,7 @@ int main(void)
 		{
 			if(g_keyboard_buffer_cnt > 0)
 			{
-				g_main_osc.note = get_playing_key(0);
+				g_main_osc.note = get_playing_key(0) + 60 - 12;
 				g_main_osc.enable = 1;
 			}
 			else

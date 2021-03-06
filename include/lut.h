@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 
-extern const uint16_t lut_notestep [128] PROGMEM;
+extern const uint32_t lut_notestep [128] PROGMEM;
 extern const uint8_t lut_sine [256] PROGMEM;
 
 typedef enum keys_t
