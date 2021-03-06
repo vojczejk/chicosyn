@@ -13,6 +13,13 @@ void ps2_init(void)
 
 keys_t ps2_scan_to_keyboard(uint8_t scan_byte)
 {
+    static uint8_t ignorenext = 0;
+    if(ignorenext)
+    {
+        ignorenext = 0;
+        return KEY_CNT;
+    }
+
     switch (scan_byte)
     {
         case 0x1A:
@@ -84,6 +91,9 @@ keys_t ps2_scan_to_keyboard(uint8_t scan_byte)
             return F2s;
         case 0x5B:
             return G2;
+        case 0xF0:
+            ignorenext = 1;
+            return KEY_END;
         default:
             return KEY_CNT;
     }
@@ -116,9 +126,12 @@ ISR(INT1_vect)
             uint8_t tmp;
             printf("%x\n\r",data);
             tmp = ps2_scan_to_keyboard(data);
-            if(tmp != KEY_CNT)
+            if(tmp == KEY_END)
+                g_main_osc.enable = 0;
+            else if(tmp != KEY_CNT)
             {
-		        g_main_osc.note = (uint8_t)tmp + 60-12-12;
+                g_main_osc.enable = 1;
+		        g_main_osc.note = (uint8_t)tmp + 60-12;
             }
             bitcount = 11;
             data = 0;

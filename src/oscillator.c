@@ -24,7 +24,7 @@ void osc_step(oscillator_t * osc)
 uint8_t osc_out(oscillator_t * osc)
 {
     //Sine
-    //return pgm_read_byte(&lut_sine[(uint8_t)(osc->count >> 24)]);
+    return pgm_read_byte(&lut_sine[(uint8_t)((osc->count/2) >> 24)]);
     //Square
-    return ((uint8_t)(osc->count >> 24) > 0x80) ? 255 : 0;
+    //return ((uint8_t)((osc->count/2) >> 24) > 0x80) ? 255 : 0;
 }
