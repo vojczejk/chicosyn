@@ -1,0 +1,7 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define KEYBOARD_BUFFER_SIZE 16
+#define SCANCODE_BUFFER_SIZE 16
+
+#endif

@@ -6,6 +6,8 @@
 
 oscillator_t g_main_osc;
 
+volatile uint8_t flag_update_osc = 0;
+
 void osc_init(oscillator_t * osc)
 {
     osc->count = 0;

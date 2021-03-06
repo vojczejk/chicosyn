@@ -8,6 +8,7 @@
 #include "ps2.h"
 #include "samplegen.h"
 #include "oscillator.h"
+#include "keyboard.h"
 
 uint8_t i = 0;
 unsigned j;
@@ -39,6 +40,20 @@ int main(void)
     while(1)
     {
 		ps2_scancode_runner();
+
+		if(flag_update_osc)
+		{
+			if(g_keyboard_buffer_cnt > 0)
+			{
+				g_main_osc.note = get_playing_key(0);
+				g_main_osc.enable = 1;
+			}
+			else
+			{
+				g_main_osc.enable = 0;
+			}
+			flag_update_osc = 0;
+		}
 		/*
 		for(j = 0; j < 20000/2; ++j)
 		{

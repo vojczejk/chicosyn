@@ -3,6 +3,7 @@
 
 #include  <stdint.h>
 
+extern volatile uint8_t flag_update_osc;
 
 typedef struct oscillator_t
 {

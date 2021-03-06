@@ -35,7 +35,7 @@ ISR(INT1_vect)
             //Report new scancode
             g_last_scancode = data;
             flag_process_scancode = 1;
-            printf("scan %02x\r\n",g_last_scancode);
+            //printf("scan %02x\r\n",g_last_scancode);
 
             bitcount = 11;
             data = 0;
@@ -161,6 +161,7 @@ void ps2_scancode_runner()
         if(key < LIMITER_KEY)
         {
             //release a key
+            printf("R%u\r\n",key);
             g_main_osc.enable = 0;
         }
         //nothing else needs releasing, just ignore
@@ -182,12 +183,10 @@ void ps2_scancode_runner()
             g_left_to_ignore = 7; 
         else if(key < LIMITER_KEY)
         {
-            //play a key!
-            {
-                g_main_osc.enable = 1;
-		        g_main_osc.note = (uint8_t)key + 60-12;
-            }
-
+            //play a note
+            printf("%u\r\n",key);
+            g_main_osc.enable = 1;
+		    g_main_osc.note = (uint8_t)key + 60-12;
         }
         else if(key < LIMITER_ACTION)
         {
