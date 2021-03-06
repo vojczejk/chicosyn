@@ -27,6 +27,7 @@ void gen_sample()
     uint8_t tmp;
     osc_step(&g_main_osc);
 	tmp = osc_out(&g_main_osc);
+    //printf("%u\r\n",tmp);
     ring_buffer_queue(&g_audio_buf,(char)tmp);
 }
 

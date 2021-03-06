@@ -43,13 +43,13 @@ int main(void)
     while(1)
     {
 		ps2_scancode_runner();
-		soundgen_runner();
+		//soundgen_runner();
 		if(flag_update_osc)
 		{
 			uint8_t i = 0;
 			if(g_keyboard_buffer_cnt > 0)
 			{
-				g_main_osc.note = get_playing_key(0) + 60 - 12;
+				g_main_osc.note = get_playing_key(0) + 60 - 12 -12;
 				g_main_osc.enable = 1;
 			}
 			else
