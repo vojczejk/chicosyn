@@ -118,7 +118,7 @@ ISR(INT1_vect)
             tmp = ps2_scan_to_keyboard(data);
             if(tmp != KEY_CNT)
             {
-		        g_main_osc.note = (uint8_t)tmp + 60;
+		        g_main_osc.note = (uint8_t)tmp + 60-12-12;
             }
             bitcount = 11;
             data = 0;
