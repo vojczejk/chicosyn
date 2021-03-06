@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "ps2.h"
 #include "oscillator.h"
+#include "keyboard.h"
 
 volatile uint8_t flag_in_escape_0 = 0;
 volatile uint8_t flag_in_release = 0;
@@ -34,8 +35,6 @@ ISR(INT1_vect)
         {
             if(!ring_buffer_is_full(&g_ps2_buf))
                 ring_buffer_queue(&g_ps2_buf,(char)data);
-            //printf("scan %02x\r\n",g_last_scancode);
-
             bitcount = 11;
             data = 0;
         }

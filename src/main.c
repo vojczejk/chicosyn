@@ -9,6 +9,7 @@
 #include "samplegen.h"
 #include "oscillator.h"
 #include "keyboard.h"
+#include "soundgen.h"
 
 uint8_t i = 0;
 unsigned j;
@@ -31,6 +32,8 @@ int main(void)
 	timer0_init();
 	ps2_init();
 	sampletimer_init();
+	soundgen_init();
+	
 
 	osc_init(&g_main_osc);
 	g_main_osc.enable = 0;
@@ -40,9 +43,10 @@ int main(void)
     while(1)
     {
 		ps2_scancode_runner();
-
+		soundgen_runner();
 		if(flag_update_osc)
 		{
+			uint8_t i = 0;
 			if(g_keyboard_buffer_cnt > 0)
 			{
 				g_main_osc.note = get_playing_key(0) + 60 - 12;
@@ -54,31 +58,6 @@ int main(void)
 			}
 			flag_update_osc = 0;
 		}
-		/*
-		for(j = 0; j < 20000/2; ++j)
-		{
-			_delay_us(2);
-			OCR0 = i++;
-		}
-		for(j = 1; j < 20000/3; ++j)
-		{
-			_delay_us(3);
-			OCR0 = i++;
-		}
-		for(j = 0; j < 20000/4; ++j)
-		{
-			_delay_us(4);
-			OCR0 = i++;
-		}
-		*/
-		/*scanf("%d",&i);
-        printf("Read %d\r\n", i);*/
-		//printf("%u\r\n",TCNT0);
-		/*static uint8_t bold, dold;
-		if(bold != (PINB & 0b11101111) || dold != PIND)
-			printf("%02x -> %02x,%02x -> %02x\r\n",bold, PINB & 0b11101111,dold,PIND);
-		bold = PINB & 0b11101111;
-		dold = PIND;*/
     }
 
 }

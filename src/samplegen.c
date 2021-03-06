@@ -4,6 +4,7 @@
 
 #include "samplegen.h"
 #include "oscillator.h"
+#include "soundgen.h"
 
 void sampletimer_init()
 {
@@ -17,7 +18,7 @@ void sampletimer_init()
     // OC1C output: Disconnected
     // Noise Canceler: Off
     // Input Capture on Falling Edge
-    // Timer Period: 0.01 ms
+    // Timer Period: 0.04 ms
     // Timer1 Overflow Interrupt: Off
     // Input Capture Interrupt: Off
     // Compare A Match Interrupt: Off
@@ -29,8 +30,8 @@ void sampletimer_init()
     TCNT1L=0x00;
     ICR1H=0x00;
     ICR1L=0x00;
-    OCR1AH=0x00;
-    OCR1AL=0x9F;
+    OCR1AH=0x01;
+    OCR1AL=0x3F;
     OCR1BH=0x00;
     OCR1BL=0x00;
     OCR1CH=0x00;
@@ -42,7 +43,5 @@ void sampletimer_init()
 
 ISR(TIMER1_COMPA_vect)
 {
-    osc_step(&g_main_osc);
-	OCR0 = osc_out(&g_main_osc);
-    //printf("%02x\r\n",cnt++);
+	OCR0 = pop_sample();
 }

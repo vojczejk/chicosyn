@@ -3,6 +3,8 @@
 
 #include  <stdint.h>
 
+#include "config.h"
+
 extern volatile uint8_t flag_update_osc;
 
 typedef struct oscillator_t
@@ -12,10 +14,10 @@ typedef struct oscillator_t
     uint8_t enable;
 } oscillator_t;
 
+
 void osc_init(oscillator_t * osc);
 void osc_step(oscillator_t * osc);
 uint8_t osc_out(oscillator_t * osc);
-
 
 extern oscillator_t g_main_osc;
 
