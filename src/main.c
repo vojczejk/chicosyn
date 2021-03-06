@@ -38,9 +38,7 @@ int main(void)
 
     while(1)
     {
-		unsigned tmp;
-		scanf("%u",&tmp);
-		g_main_osc.note = (uint8_t)tmp;
+		ps2_scancode_runner();
 		/*
 		for(j = 0; j < 20000/2; ++j)
 		{

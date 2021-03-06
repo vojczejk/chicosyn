@@ -2,6 +2,51 @@
 #include "ps2.h"
 #include "oscillator.h"
 
+volatile uint8_t flag_process_scancode = 0;
+volatile uint8_t flag_in_escape_0 = 0;
+volatile uint8_t flag_in_release = 0;
+
+volatile uint8_t g_last_scancode = 0;
+volatile uint8_t g_left_to_ignore = 0;
+
+ISR(INT1_vect)
+{
+    static unsigned char data;// Holds the received scan code
+    static uint8_t edge = 1;
+    static uint8_t bitcount = 11;
+    if (!edge) // Routine entered at falling edge
+    {
+        if(bitcount < 11 && bitcount > 2)// Bit 3 to 10 is data. Parity bit,
+        {          
+            // start and stop bits are ignored.
+            data = (data >> 1);
+            if(PIND & 0b00000001)
+            data = data | 0x80;// Store a �1�
+        }
+
+        //Set interrupt on rising edge
+        EICRA = (0<<ISC31) | (0<<ISC30) | (0<<ISC21) | (0<<ISC20) | (1<<ISC11) | (1<<ISC10) | (0<<ISC01) | (0<<ISC00);
+        edge = 1;
+    } 
+    else // Routine entered at rising edge
+    {   
+        if(--bitcount == 0)// All bits received
+        {
+            //Report new scancode
+            g_last_scancode = data;
+            flag_process_scancode = 1;
+            printf("scan %02x\r\n",g_last_scancode);
+
+            bitcount = 11;
+            data = 0;
+        }
+        
+        // Set interrupt on falling edge
+        EICRA=(0<<ISC31) | (0<<ISC30) | (0<<ISC21) | (0<<ISC20) | (1<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
+        edge = 0;
+    }
+}
+
 void ps2_init(void)
 {
     //Rising edge on interrupt 1
@@ -11,15 +56,8 @@ void ps2_init(void)
     EIFR  |=(1<<INTF1);
 }
 
-keys_t ps2_scan_to_keyboard(uint8_t scan_byte)
+keys_t ps2_scan_translate(uint8_t scan_byte)
 {
-    static uint8_t ignorenext = 0;
-    if(ignorenext)
-    {
-        ignorenext = 0;
-        return KEY_CNT;
-    }
-
     switch (scan_byte)
     {
         case 0x1A:
@@ -92,53 +130,69 @@ keys_t ps2_scan_to_keyboard(uint8_t scan_byte)
         case 0x5B:
             return G2;
         case 0xF0:
-            ignorenext = 1;
             return KEY_END;
+        case 0xE0:
+            return KEY_E0;
+        case 0xE1:
+            return KEY_E1;
         default:
-            return KEY_CNT;
+            return ERROR;
     }
-    return KEY_CNT;
+    return ERROR;
 }
  
-ISR(INT1_vect)
+void ps2_scancode_runner()
 {
-    static unsigned char data;// Holds the received scan code
-    static uint8_t edge = 1;
-    static uint8_t bitcount = 11;
-    if (!edge) // Routine entered at falling edge
-    {
-        if(bitcount < 11 && bitcount > 2)// Bit 3 to 10 is data. Parity bit,
-        {          
-            // start and stop bits are ignored.
-            data = (data >> 1);
-            if(PIND & 0b00000001)
-            data = data | 0x80;// Store a �1�
-        }
+    //printf("process %u, last %02x, ignore %u, f0 %u, e0 %u\r\n",flag_process_scancode,g_last_scancode,g_left_to_ignore,flag_in_release,flag_in_escape_0);
+    if(!flag_process_scancode)
+        return;
 
-        //Set interrupt on rising edge
-        EICRA = (0<<ISC31) | (0<<ISC30) | (0<<ISC21) | (0<<ISC20) | (1<<ISC11) | (1<<ISC10) | (0<<ISC01) | (0<<ISC00);
-        edge = 1;
-    } 
-    else // Routine entered at rising edge
-    {   
-        if(--bitcount == 0)// All bits received
+    if(g_left_to_ignore > 0)
+    {
+        g_left_to_ignore--;
+        flag_process_scancode = 0;
+        return;
+    }
+
+    if(flag_in_release) //f0 was previous code
+    {
+        keys_t key = ps2_scan_translate(g_last_scancode);
+        //printf("release\r\n");
+        if(key < LIMITER_KEY)
         {
-            uint8_t tmp;
-            printf("%x\n\r",data);
-            tmp = ps2_scan_to_keyboard(data);
-            if(tmp == KEY_END)
-                g_main_osc.enable = 0;
-            else if(tmp != KEY_CNT)
+            //release a key
+            g_main_osc.enable = 0;
+        }
+        //nothing else needs releasing, just ignore
+        flag_in_release = 0;
+    }
+    else if(flag_in_escape_0) //e0 was previous code
+    {
+        //ignore for now
+        flag_in_escape_0 = 0;
+    }
+    else //Starting new scan code
+    {
+        keys_t key = ps2_scan_translate(g_last_scancode);
+        if(key == KEY_E0)
+            flag_in_escape_0 = 1;
+        else if(key == KEY_END)
+            flag_in_release = 1;
+        else if(key == KEY_E1) //Only key with E1 is break. Ignore the rest of it.
+            g_left_to_ignore = 7; 
+        else if(key < LIMITER_KEY)
+        {
+            //play a key!
             {
                 g_main_osc.enable = 1;
-		        g_main_osc.note = (uint8_t)tmp + 60-12;
+		        g_main_osc.note = (uint8_t)key + 60-12;
             }
-            bitcount = 11;
-            data = 0;
+
         }
-        
-        // Set interrupt on falling edge
-        EICRA=(0<<ISC31) | (0<<ISC30) | (0<<ISC21) | (0<<ISC20) | (1<<ISC11) | (0<<ISC10) | (0<<ISC01) | (0<<ISC00);
-        edge = 0;
+        else if(key < LIMITER_ACTION)
+        {
+            //do things! 
+        }
     }
+    flag_process_scancode = 0; //clear process flag
 }
