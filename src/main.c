@@ -10,6 +10,7 @@
 #include "oscillator.h"
 #include "keyboard.h"
 #include "soundgen.h"
+#include "arp.h"
 
 uint8_t i = 0;
 unsigned j;
@@ -43,20 +44,27 @@ int main(void)
     while(1)
     {
 		ps2_scancode_runner();
-		//soundgen_runner();
-		if(flag_update_osc)
+		if(flag_arpeggio)
 		{
-			uint8_t i = 0;
-			if(g_keyboard_buffer_cnt > 0)
+			arp_runner();
+		}
+		else
+		{
+			//soundgen_runner();
+			if(flag_update_osc)
 			{
-				g_main_osc.note = get_playing_key(0) + (12*g_keyboard_transpose);
-				g_main_osc.enable = 1;
+				uint8_t i = 0;
+				if(g_keyboard_buffer_cnt > 0)
+				{
+					g_main_osc.note = get_playing_key(0) + (g_keyboard_transpose);
+					g_main_osc.enable = 1;
+				}
+				else
+				{
+					g_main_osc.enable = 0;
+				}
+				flag_update_osc = 0;
 			}
-			else
-			{
-				g_main_osc.enable = 0;
-			}
-			flag_update_osc = 0;
 		}
     }
 

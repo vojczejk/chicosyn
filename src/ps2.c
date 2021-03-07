@@ -2,6 +2,7 @@
 #include "ps2.h"
 #include "oscillator.h"
 #include "keyboard.h"
+#include "arp.h"
 
 volatile uint8_t flag_in_escape_0 = 0;
 volatile uint8_t flag_in_release = 0;
@@ -174,6 +175,7 @@ void ps2_scancode_runner()
             release_key((uint8_t)key);
             //printf("R%u\r\n",key);
             flag_update_osc = 1;
+            //arp_reset();
         }
         //nothing else needs releasing, just ignore
         flag_in_release = 0;
@@ -194,7 +196,8 @@ void ps2_scancode_runner()
             switch (key)
             {
             case CMD_ARP_FAST:
-                printf("arp fast\r\n");
+                //printf("arp fast\r\n");
+                arp_faster();
                 //ARP UP
                 break;
             default:
@@ -218,6 +221,7 @@ void ps2_scancode_runner()
             //play a note
             play_key((uint8_t)key);
             flag_update_osc = 1;
+            //arp_reset();
             //printf("%u\r\n",key);
         }
         else if(key < LIMITER_ACTION)
@@ -231,11 +235,12 @@ void ps2_scancode_runner()
                 command_transpose_down();
                 break;
             case CMD_ARP_TOGGLE:
-                printf("arp toggle\r\n");
-                //arp toggle
+                //printf("arp toggle\r\n");
+                flag_arpeggio = !flag_arpeggio;
                 break;
             case CMD_ARP_SLOW:
-                printf("arp slow\r\n");
+                //printf("arp slow\r\n");
+                arp_slower();
                 //arp slow
                 break;
             default:

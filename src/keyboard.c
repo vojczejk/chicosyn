@@ -5,7 +5,7 @@
 
 uint8_t g_keyboard_buffer[KEYBOARD_BUFFER_SIZE];
 uint8_t g_keyboard_buffer_cnt = 0;
-uint8_t g_keyboard_transpose = DEFAULT_OCTAVE;
+uint8_t g_keyboard_transpose = DEFAULT_OCTAVE*12;
 
 void play_key(uint8_t keyID)
 {
@@ -83,14 +83,14 @@ void print_key_buffer()
 
 void command_transpose_up()
 {
-    if(g_keyboard_transpose < MAX_OCTAVE)
-        g_keyboard_transpose++;
+    if(g_keyboard_transpose < MAX_OCTAVE*12)
+        g_keyboard_transpose+=12;
     flag_update_osc = 1;
 }
 
 void command_transpose_down()
 {
     if(g_keyboard_transpose > 0)
-        g_keyboard_transpose--;
+        g_keyboard_transpose-=12;
     flag_update_osc = 1;
 }

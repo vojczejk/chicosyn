@@ -5,6 +5,9 @@
 #include "samplegen.h"
 #include "oscillator.h"
 #include "soundgen.h"
+#include "common.h"
+
+uint16_t g_sample_cnt = 0;
 
 void sampletimer_init()
 {
@@ -75,6 +78,7 @@ ISR(TIMER1_COMPA_vect)
 {
     osc_step(&g_main_osc);
     OCR0 = osc_out(&g_main_osc);
+    g_sample_cnt++;
     //printf("%u\r\n",OCR0);
 	//OCR0 = pop_sample();
 }
