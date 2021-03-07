@@ -20,9 +20,12 @@ typedef enum keys_t
     //here go actions
     CMD_TRANSPOSE_UP = 33,
     CMD_TRANSPOSE_DOWN = 34,
+    CMD_ARP_TOGGLE = 35,
+    CMD_ARP_FAST =36,
+    CMD_ARP_SLOW = 37,
     
     //limiter
-    LIMITER_ACTION=35,
+    LIMITER_ACTION=38,
 
     //special flag values
     KEY_END=128,

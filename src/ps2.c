@@ -133,6 +133,12 @@ keys_t ps2_scan_translate(uint8_t scan_byte)
             return CMD_TRANSPOSE_UP;
         case 0x58:
             return CMD_TRANSPOSE_DOWN;
+        case 0x14:
+            return CMD_ARP_TOGGLE;
+        case 0x1F: //E0 code
+            return CMD_ARP_FAST;
+        case 0x11:
+            return CMD_ARP_SLOW;
         case 0xF0:
             return KEY_END;
         case 0xE0:
@@ -171,10 +177,30 @@ void ps2_scancode_runner()
         }
         //nothing else needs releasing, just ignore
         flag_in_release = 0;
+        flag_in_escape_0  = 0;
     }
     else if(flag_in_escape_0) //e0 was previous code
     {
-        //ignore for now
+        ring_buffer_dequeue(&g_ps2_buf,&tmp);
+        keys_t key = ps2_scan_translate((uint8_t)tmp);
+        
+        if(key == KEY_END) //if F0 then set flag, do not clear escape
+        {
+            flag_in_release = 1;
+            return;
+        }
+        else //starting e0 key
+        {
+            switch (key)
+            {
+            case CMD_ARP_FAST:
+                printf("arp fast\r\n");
+                //ARP UP
+                break;
+            default:
+                break;
+            }
+        }
         flag_in_escape_0 = 0;
     }
     else //Starting new scan code
@@ -185,7 +211,7 @@ void ps2_scancode_runner()
             flag_in_escape_0 = 1;
         else if(key == KEY_END)
             flag_in_release = 1;
-        else if(key == KEY_E1) //Only key with E1 is break. Ignore the rest of it.
+        else if(key == KEY_E1) //Only key with E1 is break. Ignore the rest of it. //Hopefully it wont break?
             g_left_to_ignore = 7; 
         else if(key < LIMITER_KEY)
         {
@@ -203,6 +229,14 @@ void ps2_scancode_runner()
                 break;
             case CMD_TRANSPOSE_DOWN:
                 command_transpose_down();
+                break;
+            case CMD_ARP_TOGGLE:
+                printf("arp toggle\r\n");
+                //arp toggle
+                break;
+            case CMD_ARP_SLOW:
+                printf("arp slow\r\n");
+                //arp slow
                 break;
             default:
                 break;
