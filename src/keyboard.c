@@ -1,9 +1,11 @@
 #include <stdio.h>
 
 #include "keyboard.h"
+#include "oscillator.h"
 
 uint8_t g_keyboard_buffer[KEYBOARD_BUFFER_SIZE];
 uint8_t g_keyboard_buffer_cnt = 0;
+uint8_t g_keyboard_transpose = DEFAULT_OCTAVE;
 
 void play_key(uint8_t keyID)
 {
@@ -77,4 +79,18 @@ void print_key_buffer()
         printf("%u ",g_keyboard_buffer[i]);
     }
     printf("\r\n");
+}
+
+void command_transpose_up()
+{
+    if(g_keyboard_transpose < MAX_OCTAVE)
+        g_keyboard_transpose++;
+    flag_update_osc = 1;
+}
+
+void command_transpose_down()
+{
+    if(g_keyboard_transpose > 0)
+        g_keyboard_transpose--;
+    flag_update_osc = 1;
 }

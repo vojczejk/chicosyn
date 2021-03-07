@@ -18,9 +18,11 @@ typedef enum keys_t
     LIMITER_KEY=32,
 
     //here go actions
+    CMD_TRANSPOSE_UP = 33,
+    CMD_TRANSPOSE_DOWN = 34,
     
     //limiter
-    LIMITER_ACTION=33,
+    LIMITER_ACTION=35,
 
     //special flag values
     KEY_END=128,

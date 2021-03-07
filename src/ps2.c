@@ -129,6 +129,10 @@ keys_t ps2_scan_translate(uint8_t scan_byte)
             return F2s;
         case 0x5B:
             return G2;
+        case 0x0D:
+            return CMD_TRANSPOSE_UP;
+        case 0x58:
+            return CMD_TRANSPOSE_DOWN;
         case 0xF0:
             return KEY_END;
         case 0xE0:
@@ -192,7 +196,17 @@ void ps2_scancode_runner()
         }
         else if(key < LIMITER_ACTION)
         {
-            //do things! 
+            switch (key)
+            {
+            case CMD_TRANSPOSE_UP:
+                command_transpose_up();
+                break;
+            case CMD_TRANSPOSE_DOWN:
+                command_transpose_down();
+                break;
+            default:
+                break;
+            }
         }
     }
 }

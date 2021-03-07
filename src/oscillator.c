@@ -24,14 +24,20 @@ void osc_step(oscillator_t * osc)
 }
 
 uint8_t osc_out(oscillator_t * osc)
-{
+{   
+    uint8_t saw = (uint8_t)(osc->count >> 24);
     if(osc->enable)
     //Saw
-          return (uint8_t)(osc->count >> 24); 
+        //return saw; 
     //Sine
-    //    return (pgm_read_byte(&lut_sine[(uint8_t)((osc->count) >> 24)]))  
+        //return (pgm_read_byte(&lut_sine[saw]));
     //Square
-     //   return ((uint8_t)((osc->count) >> 24) > 0x80) ? 255 : 0;
+        return (saw > 0x80) ? 255 : 0;
+    //Triangle
+        //if(saw < 0x80)
+        //    return saw << 1;
+        //else
+        //    return (0x80 - (saw - 0x80)) << 1;
     else
         return 0x80;
 }
