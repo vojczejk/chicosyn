@@ -23,7 +23,7 @@ void arp_runner()
             g_arp_step = (g_arp_step + 1);
             if(g_arp_step >= g_keyboard_buffer_cnt)
                 g_arp_step = 0;
-            printf("%u,%lu\r\n",g_arp_step,g_sample_cnt);
+            //printf("%u,%lu\r\n",g_arp_step,g_sample_cnt);
 
             g_main_osc.note = get_playing_key(g_arp_step) + (g_keyboard_transpose);
             //if(g_main_osc.note == 0xFF)
