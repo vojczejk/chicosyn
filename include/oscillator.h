@@ -11,7 +11,7 @@ typedef struct oscillator_t
 {
     uint32_t count;
     uint8_t note;
-    uint8_t enable;
+    uint8_t on;
 } oscillator_t;
 
 
@@ -20,5 +20,7 @@ void osc_step(oscillator_t * osc);
 uint8_t osc_out(oscillator_t * osc);
 
 extern oscillator_t g_main_osc;
+extern oscillator_t g_sec_osc;
+extern oscillator_t g_tert_osc;
 
 #endif

@@ -5,19 +5,21 @@
 
 
 oscillator_t g_main_osc;
+oscillator_t g_sec_osc;
+oscillator_t g_tert_osc;
 
 volatile uint8_t flag_update_osc = 0;
 
 void osc_init(oscillator_t * osc)
 {
     osc->count = 0;
-    osc->enable = 0;
+    osc->on = 0;
     osc->note = 69;
 }
 
 void osc_step(oscillator_t * osc)
 {
-    if(osc->enable)
+    if(osc->on)
         osc->count += ((uint32_t)pgm_read_dword(&lut_notestep[osc->note]));
     else
         osc->count = 0;
@@ -26,13 +28,13 @@ void osc_step(oscillator_t * osc)
 uint8_t osc_out(oscillator_t * osc)
 {   
     uint8_t saw = (uint8_t)(osc->count >> 24);
-    if(osc->enable)
+    if(osc->on)
     //Saw
         //return saw; 
     //Sine
-        //return (pgm_read_byte(&lut_sine[saw]));
+        return (pgm_read_byte(&lut_sine[saw]));
     //Square
-        return (saw > 0x80) ? 255 : 0;
+        //return (saw > 0x80) ? 255 : 0;
     //Triangle
         //if(saw < 0x80)
         //    return saw << 1;

@@ -9,7 +9,6 @@
 #include "samplegen.h"
 #include "oscillator.h"
 #include "keyboard.h"
-#include "soundgen.h"
 #include "arp.h"
 
 uint8_t i = 0;
@@ -33,11 +32,10 @@ int main(void)
 	timer0_init();
 	ps2_init();
 	sampletimer_init();
-	soundgen_init();
-	
 
 	osc_init(&g_main_osc);
-	g_main_osc.enable = 0;
+	osc_init(&g_sec_osc);
+	osc_init(&g_tert_osc);
 
 	sei();
 
@@ -56,11 +54,17 @@ int main(void)
 				if(g_keyboard_buffer_cnt > 0)
 				{
 					g_main_osc.note = get_playing_key(0) + (g_keyboard_transpose);
-					g_main_osc.enable = 1;
+					g_sec_osc.note = get_playing_key(0) + (g_keyboard_transpose-12);
+					g_tert_osc.note = get_playing_key(0) + (g_keyboard_transpose-24);
+					g_main_osc.on = 1;
+					g_sec_osc.on = 1;
+					g_tert_osc.on = 1;
 				}
 				else
 				{
-					g_main_osc.enable = 0;
+					g_main_osc.on = 0;
+					g_sec_osc.on = 0;
+					g_tert_osc.on = 0;
 				}
 				flag_update_osc = 0;
 			}

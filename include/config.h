@@ -7,7 +7,7 @@
 #define KEYBOARD_BUFFER_SIZE 16
 
 #define DEFAULT_OCTAVE 4
-#define MAX_OCTAVE 6
+#define MAX_OCTAVE 7
 
 #define DEFAULT_ARP_TICKS 1200
 #define ARP_STEP 100
