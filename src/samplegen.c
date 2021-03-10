@@ -7,7 +7,7 @@
 #include "soundgen.h"
 #include "common.h"
 
-uint16_t g_sample_cnt = 0;
+volatile uint32_t g_sample_cnt = 0;
 
 void sampletimer_init()
 {

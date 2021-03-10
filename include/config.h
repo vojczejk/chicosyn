@@ -10,7 +10,8 @@
 #define MAX_OCTAVE 6
 
 #define DEFAULT_ARP_TICKS 1200
-#define ARP_MIN_TICKS 2000
-#define ARP_MAX_TICKS 40000
+#define ARP_STEP 100
+#define ARP_MIN_TICKS 500
+#define ARP_MAX_TICKS 5000
 
 #endif

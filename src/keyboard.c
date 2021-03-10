@@ -2,6 +2,7 @@
 
 #include "keyboard.h"
 #include "oscillator.h"
+#include "arp.h"
 
 uint8_t g_keyboard_buffer[KEYBOARD_BUFFER_SIZE];
 uint8_t g_keyboard_buffer_cnt = 0;
@@ -9,25 +10,23 @@ uint8_t g_keyboard_transpose = DEFAULT_OCTAVE*12;
 
 void play_key(uint8_t keyID)
 {
-    if(g_keyboard_buffer_cnt < KEYBOARD_BUFFER_SIZE) //Run only if buffer has space
+    uint8_t i;
+    for(i = 0; i < g_keyboard_buffer_cnt; ++i)
     {
-        release_key(keyID); //making sure the key is not there
-        insert_playing_key(0,keyID); //Play it with top priority
+        if(g_keyboard_buffer[i] == keyID)
+            return;
     }
+    insert_playing_key(0,keyID); //Play it with top priority
 }
 
 void release_key(uint8_t keyID)
 {
     uint8_t i;
-    //printf("releasestart\r\n"); 
-    //print_key_buffer();
     for(i = 0; i < g_keyboard_buffer_cnt; ++i)
     {
         if(g_keyboard_buffer[i] == keyID)
             del_playing_key(i);
     }
-    //print_key_buffer();
-    //printf("releaseend\r\n"); 
 }
 
 uint8_t get_playing_key(uint8_t index)

@@ -4,9 +4,9 @@
 #include <stdint.h>
 
 extern uint8_t flag_arpeggio;
-extern uint16_t g_arp_ticks;
+extern uint32_t g_arp_ticks;
 extern uint8_t g_arp_step;
-extern uint16_t g_arp_lastchange;
+extern uint32_t g_arp_lastchange;
 
 void arp_runner();
 
