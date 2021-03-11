@@ -4,12 +4,7 @@
 #include "keyboard.h"
 #include "arp.h"
 
-volatile uint8_t flag_in_escape_0 = 0;
-volatile uint8_t flag_in_release = 0;
-volatile uint8_t g_left_to_ignore = 0;
-
 ring_buffer_t g_ps2_buf;
-
 
 ISR(INT1_vect)
 {
@@ -36,7 +31,7 @@ ISR(INT1_vect)
         {
             if(!ring_buffer_is_full(&g_ps2_buf))
                 ring_buffer_queue(&g_ps2_buf,(char)data);
-            printf("%02x\r\n",data);
+            //printf("%02x\r\n",data);
             bitcount = 11;
             data = 0;
         }
@@ -60,193 +55,332 @@ void ps2_init(void)
 
 keys_t ps2_scan_translate(uint8_t scan_byte)
 {
-    switch (scan_byte)
+    static uint8_t e0 = 0, f0 = 0, e1cnt = 0, ret=ERROR;
+    if(e1cnt > 0) //Skipping pause-break
     {
-        case 0x1A:
-            return C0;
-        case 0x1B:
-            return C0s;
-        case 0x22:
-            return D0;
-        case 0x23:
-            return D0s;
-        case 0x21:
-            return E0;
-        case 0x2A:
-            return F0;
-        case 0x34:
-            return F0s;
-        case 0x32:
-            return G0;
-        case 0x33:
-            return G0s;
-        case 0x31:
-            return A0;
-        case 0x3B:
-            return A0s;
-        case 0x3A:
-            return B0;
-        case 0x41:
-        case 0x15:
-            return C1;
-        case 0x4B:
-        case 0x1E:
-            return C1s;
-        case 0x49:
-        case 0x1D:
-            return D1;
-        case 0x4C:
-        case 0x26:
-            return D1s;
-        case 0x4A:
-        case 0x24:
-            return E1;
-        case 0x2D:
-            return F1;
-        case 0x2E:
-            return F1s;
-        case 0x2C:
-            return G1;
-        case 0x36:
-            return G1s;
-        case 0x35:
-            return A1;
-        case 0x3D:
-            return A1s;
-        case 0x3C:
-            return B1;
-        case 0x43:
-            return C2;
-        case 0x46:
-            return C2s;
-        case 0x44:
-            return D2;
-        case 0x45:
-            return D2s;
-        case 0x4D:
-            return E2;
-        case 0x54:
-            return F2;
-        case 0x55:
-            return F2s;
-        case 0x5B:
-            return G2;
-        case 0x0D:
-            return CMD_TRANSPOSE_UP;
-        case 0x58:
-            return CMD_TRANSPOSE_DOWN;
-        /*case 0x14:
-            return CMD_ARP_TOGGLE;
-        case 0x1F: //E0 code
-            return CMD_ARP_FAST;
-        case 0x11:
-            return CMD_ARP_SLOW;*/
-        case 0xF0:
-            return KEY_END;
-        case 0xE0:
-            return KEY_E0;
-        case 0xE1:
-            return KEY_E1;
-        default:
-            return ERROR;
+        e1cnt--;
+        return NO_KEY;
     }
-    return ERROR;
+    if(e0)
+    {
+        //printf("e0 ");
+        if(f0)
+        {
+            //printf("release\r\n");
+            ret = ERROR;
+        }
+        else
+        {
+            //printf("press\r\n");
+            switch(scan_byte)
+            {
+                case 0x1F: //E0 code
+                    ret = CMD_ARP_FAST;
+                    break;
+                case 0xF0:
+                    f0 = 1;
+                    return NO_KEY;
+                default:
+                    ret = ERROR;
+            }
+        }
+    }
+    else
+    {
+        //printf("no e0 ");
+        if(f0)
+        {
+            //printf("release\r\n");
+            switch (scan_byte)
+            {
+                case 0x1A:
+                    ret = C0R;
+                    break;
+                case 0x1B:
+                    ret = C0sR;
+                    break;
+                case 0x22:
+                    ret = D0R;
+                    break;
+                case 0x23:
+                    ret = D0sR;
+                    break;
+                case 0x21:
+                    ret = E0R;
+                    break;
+                case 0x2A:
+                    ret = F0R;
+                    break;
+                case 0x34:
+                    ret = F0sR;
+                    break;
+                case 0x32:
+                    ret = G0R;
+                    break;
+                case 0x33:
+                    ret = G0sR;
+                    break;
+                case 0x31:
+                    ret = A0R;
+                    break;
+                case 0x3B:
+                    ret = A0sR;
+                    break;
+                case 0x3A:
+                    ret = B0R;
+                    break;
+                case 0x41:
+                case 0x15:
+                    ret = C1R;
+                    break;
+                case 0x4B:
+                case 0x1E:
+                    ret = C1sR;
+                    break;
+                case 0x49:
+                case 0x1D:
+                    ret = D1R;
+                    break;
+                case 0x4C:
+                case 0x26:
+                    ret = D1sR;
+                    break;
+                case 0x4A:
+                case 0x24:
+                    ret = E1R;
+                    break;
+                case 0x2D:
+                    ret = F1R;
+                    break;
+                case 0x2E:
+                    ret = F1sR;
+                    break;
+                case 0x2C:
+                    ret = G1R;
+                    break;
+                case 0x36:
+                    ret = G1sR;
+                    break;
+                case 0x35:
+                    ret = A1R;
+                    break;
+                case 0x3D:
+                    ret = A1sR;
+                    break;
+                case 0x3C:
+                    ret = B1R;
+                    break;
+                case 0x43:
+                    ret = C2R;
+                    break;
+                case 0x46:
+                    ret = C2sR;
+                    break;
+                case 0x44:
+                    ret = D2R;
+                    break;
+                case 0x45:
+                    ret = D2sR;
+                    break;
+                case 0x4D:
+                    ret = E2R;
+                    break;
+                case 0x54:
+                    ret = F2R;
+                    break;
+                case 0x55:
+                    ret = F2sR;
+                    break;
+                case 0x5B:
+                    ret = G2R;
+                    break;
+                default:
+                    ret = ERROR;
+            }
+        }
+        else
+        {
+            //printf("press\r\n");
+            switch (scan_byte)
+            {
+                case 0x1A:
+                    ret = C0;
+                    break;
+                case 0x1B:
+                    ret = C0s;
+                    break;
+                case 0x22:
+                    ret = D0;
+                    break;
+                case 0x23:
+                    ret = D0s;
+                    break;
+                case 0x21:
+                    ret = E0;
+                    break;
+                case 0x2A:
+                    ret = F0;
+                    break;
+                case 0x34:
+                    ret = F0s;
+                    break;
+                case 0x32:
+                    ret = G0;
+                    break;
+                case 0x33:
+                    ret = G0s;
+                    break;
+                case 0x31:
+                    ret = A0;
+                    break;
+                case 0x3B:
+                    ret = A0s;
+                    break;
+                case 0x3A:
+                    ret = B0;
+                    break;
+                case 0x41:
+                case 0x15:
+                    ret = C1;
+                    break;
+                case 0x4B:
+                case 0x1E:
+                    ret = C1s;
+                    break;
+                case 0x49:
+                case 0x1D:
+                    ret = D1;
+                    break;
+                case 0x4C:
+                case 0x26:
+                    ret = D1s;
+                    break;
+                case 0x4A:
+                case 0x24:
+                    ret = E1;
+                    break;
+                case 0x2D:
+                    ret = F1;
+                    break;
+                case 0x2E:
+                    ret = F1s;
+                    break;
+                case 0x2C:
+                    ret = G1;
+                    break;
+                case 0x36:
+                    ret = G1s;
+                    break;
+                case 0x35:
+                    ret = A1;
+                    break;
+                case 0x3D:
+                    ret = A1s;
+                    break;
+                case 0x3C:
+                    ret = B1;
+                    break;
+                case 0x43:
+                    ret = C2;
+                    break;
+                case 0x46:
+                    ret = C2s;
+                    break;
+                case 0x44:
+                    ret = D2;
+                    break;
+                case 0x45:
+                    ret = D2s;
+                    break;
+                case 0x4D:
+                    ret = E2;
+                    break;
+                case 0x54:
+                    ret = F2;
+                    break;
+                case 0x55:
+                    ret = F2s;
+                    break;
+                case 0x5B:
+                    ret = G2;
+                    break;
+                case 0x0D:
+                    ret = CMD_TRANSPOSE_UP;
+                    break;
+                case 0x58:
+                    ret = CMD_TRANSPOSE_DOWN;
+                    break;
+                case 0x14:
+                    ret = CMD_ARP_TOGGLE;
+                    break;
+                case 0x11:
+                    ret = CMD_ARP_SLOW;
+                    break;
+                case 0xF0:
+                    f0 = 1;
+                    return NO_KEY;
+                case 0xE0:
+                    e0 = 1;
+                    return NO_KEY;
+                case 0xE1:
+                    e1cnt = 7; //7 bytes to ignore in pause-break
+                    return NO_KEY;
+                default:
+                    ret = ERROR;
+            }
+        }
+    }
+    e0 = 0;
+    f0 = 0;
+    return ret;
 }
  
 void ps2_scancode_runner()
 {
     char tmp;
+    keys_t scanned_key;
     if(ring_buffer_is_empty(&g_ps2_buf))
         return;
 
-    if(g_left_to_ignore > 0)
-    {
-        g_left_to_ignore--;
-        ring_buffer_dequeue(&g_ps2_buf,&tmp);
-        return;
-    }
+    ring_buffer_dequeue(&g_ps2_buf,&tmp);
+    scanned_key = ps2_scan_translate(tmp);
 
-    if(flag_in_release) //f0 was previous code
+    if(scanned_key == NO_KEY || scanned_key == ERROR)
+        return;
+    
+    if(scanned_key < LIMITER_KEY_ON) //Key press
     {
-        ring_buffer_dequeue(&g_ps2_buf,&tmp);
-        keys_t key = ps2_scan_translate((uint8_t)tmp);
-        //printf("release\r\n");
-        if(key < LIMITER_KEY)
-        {
-            release_key((uint8_t)key);
-            //printf("R%u\r\n",key);
-            flag_update_osc = 1;
-            //arp_reset();
-        }
-        //nothing else needs releasing, just ignore
-        flag_in_release = 0;
-        flag_in_escape_0  = 0;
+        play_key((uint8_t)scanned_key);
+        flag_update_osc = 1;
     }
-    else if(flag_in_escape_0) //e0 was previous code
+    else if(scanned_key < LIMITER_KEY_OFF) //Key release
     {
-        ring_buffer_dequeue(&g_ps2_buf,&tmp);
-        keys_t key = ps2_scan_translate((uint8_t)tmp);
-        
-        if(key == KEY_END) //if F0 then set flag, do not clear escape
-        {
-            flag_in_release = 1;
-            return;
-        }
-        else //starting e0 key
-        {
-            switch (key)
-            {
-            /*case CMD_ARP_FAST:
-                //printf("arp fast\r\n");
-                arp_faster();
-                //ARP UP*/
-                break;
-            default:
-                break;
-            }
-        }
-        flag_in_escape_0 = 0;
+        release_key((uint8_t)scanned_key-C0R);
+        flag_update_osc = 1;
     }
-    else //Starting new scan code
+    else if(scanned_key < LIMITER_ACTION)
     {
-        ring_buffer_dequeue(&g_ps2_buf,&tmp);
-        keys_t key = ps2_scan_translate((uint8_t)tmp);
-        if(key == KEY_E0)
-            flag_in_escape_0 = 1;
-        else if(key == KEY_END)
-            flag_in_release = 1;
-        else if(key == KEY_E1) //Only key with E1 is break. Ignore the rest of it. //Hopefully it wont break?
-            g_left_to_ignore = 7; 
-        else if(key < LIMITER_KEY)
+        switch (scanned_key)
         {
-            //play a note
-            play_key((uint8_t)key);
-            flag_update_osc = 1;
-            //arp_reset();
-            //printf("%u\r\n",key);
-        }
-        else if(key < LIMITER_ACTION)
-        {
-            switch (key)
-            {
-            case CMD_TRANSPOSE_UP:
-                command_transpose_up();
-                break;
-            case CMD_TRANSPOSE_DOWN:
-                command_transpose_down();
-                break;
-            /*case CMD_ARP_TOGGLE:
-                //printf("arp toggle\r\n");
-                flag_arpeggio = !flag_arpeggio;
-                break;
-            case CMD_ARP_SLOW:
-                //printf("arp slow\r\n");
-                arp_slower();
-                //arp slow
-                break;*/
-            default:
-                break;
-            }
+        case CMD_TRANSPOSE_UP:
+            command_transpose_up();
+            break;
+        case CMD_TRANSPOSE_DOWN:
+            command_transpose_down();
+            break;
+        case CMD_ARP_TOGGLE:
+            flag_arpeggio = !flag_arpeggio;
+            break;
+        case CMD_ARP_SLOW:
+            arp_slower();
+            break;
+        case CMD_ARP_FAST:
+            arp_faster();
+            break;
+        default:
+            break;
         }
     }
+    //printf("%u\r\n",scanned_key);
+    printf("\r\n"); //TODO Stops working when i remove this printf...wtf
 }

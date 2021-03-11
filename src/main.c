@@ -49,7 +49,6 @@ int main(void)
 		}
 		else
 		{
-			//soundgen_runner();
 			if(flag_update_osc)
 			{
 				if(g_keyboard_buffer_cnt > 0)
