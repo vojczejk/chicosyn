@@ -25,23 +25,23 @@ void arp_runner()
                 g_arp_step = 0;
             //printf("%u,%lu\r\n",g_arp_step,g_sample_cnt);
 
-            g_main_osc.note = get_playing_key(g_arp_step) + (g_keyboard_transpose);
-            g_sec_osc.note = get_playing_key(g_arp_step) + (g_keyboard_transpose)-12;
-            g_tert_osc.note = get_playing_key(g_arp_step) + (g_keyboard_transpose)-24;
+            g_oscillators[0].note = get_playing_key(g_arp_step) + (g_keyboard_transpose);
+            g_oscillators[1].note = get_playing_key(g_arp_step) + (g_keyboard_transpose)-12;
+            g_oscillators[2].note = get_playing_key(g_arp_step) + (g_keyboard_transpose)-24;
             //if(g_main_osc.note == 0xFF)
             
             //    printf("fug\r\n");
 
-		    g_main_osc.on = 1;
-		    g_sec_osc.on = 1;
-		    g_tert_osc.on = 1;
+		    g_oscillators[0].on = 1;
+		    g_oscillators[1].on = 1;
+		    g_oscillators[2].on = 1;
         }
     }
     else
     {
-		g_main_osc.on = 0;
-		g_sec_osc.on = 0;
-		g_tert_osc.on = 0;
+		g_oscillators[0].on = 0;
+		g_oscillators[1].on = 0;
+		g_oscillators[2].on = 0;
     }
 }
 

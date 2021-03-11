@@ -3,10 +3,12 @@
 #include "oscillator.h"
 #include "lut.h"
 
-
+/*
 oscillator_t g_main_osc;
 oscillator_t g_sec_osc;
 oscillator_t g_tert_osc;
+*/
+oscillator_t g_oscillators[3];
 
 volatile uint8_t flag_update_osc = 0;
 
@@ -32,9 +34,9 @@ uint8_t osc_out(oscillator_t * osc)
     //Saw
         //return saw; 
     //Sine
-        return (pgm_read_byte(&lut_sine[saw]));
+        //return (pgm_read_byte(&lut_sine[saw]));
     //Square
-        //return (saw > 0x80) ? 255 : 0;
+        return (saw > 0x80) ? 255 : 0;
     //Triangle
         //if(saw < 0x80)
         //    return saw << 1;

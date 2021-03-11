@@ -75,10 +75,10 @@ OCR1CL=0x00;
 
 ISR(TIMER1_COMPA_vect)
 {
-    osc_step(&g_main_osc);
-    osc_step(&g_sec_osc);
-    osc_step(&g_tert_osc);
-    OCR0 = (osc_out(&g_main_osc) >> 2) + (osc_out(&g_sec_osc) >> 2) + (osc_out(&g_tert_osc) >> 2) + 64;
+    osc_step(&g_oscillators[0]);
+    osc_step(&g_oscillators[1]);
+    osc_step(&g_oscillators[2]);
+    OCR0 = (osc_out(g_oscillators) >> 2) + (osc_out(g_oscillators+1) >> 2) + (osc_out(g_oscillators+2) >> 2) + 64;
     //OCR0 = (uint8_t)(((uint16_t)osc_out(&g_main_osc) + (uint16_t)osc_out(&g_sec_osc) + (uint16_t)osc_out(&g_tert_osc))/3);
     g_sample_cnt++;
 }

@@ -20,12 +20,36 @@ typedef enum keys_t
     //here go actions
     CMD_TRANSPOSE_UP = 33,
     CMD_TRANSPOSE_DOWN = 34,
-    CMD_ARP_TOGGLE = 35,
+    /*CMD_ARP_TOGGLE = 35,
     CMD_ARP_FAST =36,
-    CMD_ARP_SLOW = 37,
+    CMD_ARP_SLOW = 37,*/ //Old keys
+    CMD_SW_MODE = 35,
+    CMD_SEL_ARP_SPEED = 36,
+    CMD_SEL_ARP_DIR = 37,
+    CMD_SEL_ATTACK = 38,
+    CMD_SEL_DELAY = 39,
+    CMD_SEL_SUSTAIN = 40,
+    CMD_SEL_RELEASE = 41,
+    CMD_TOGGLE = 42,
+    CMD_RESET = 43,
+    CMD_SEL_OSC1 = 44,
+    CMD_SEL_OSC2 = 45,
+    CMD_SEL_OSC3 = 46,
+    CMD_INCREASE_COARSE = 47,
+    CMD_INCREASE_FINE = 48,
+    CMD_DECREASE_COARSE = 49,
+    CMD_DECREASE_FINE = 50,
+    CMD_SEL_SINE = 51,
+    CMD_SEL_TRIANGLE = 52,
+    CMD_SEL_SQUARE = 53,
+    CMD_SEL_SAW = 54,
+    CMD_SEL_OCTAVE = 55,
+    CMD_SEL_PULSEW = 59,
+
+
     
     //limiter
-    LIMITER_ACTION=38,
+    LIMITER_ACTION=60,
 
     //special flag values
     KEY_END=128,

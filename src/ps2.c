@@ -36,6 +36,7 @@ ISR(INT1_vect)
         {
             if(!ring_buffer_is_full(&g_ps2_buf))
                 ring_buffer_queue(&g_ps2_buf,(char)data);
+            printf("%02x\r\n",data);
             bitcount = 11;
             data = 0;
         }
@@ -134,12 +135,12 @@ keys_t ps2_scan_translate(uint8_t scan_byte)
             return CMD_TRANSPOSE_UP;
         case 0x58:
             return CMD_TRANSPOSE_DOWN;
-        case 0x14:
+        /*case 0x14:
             return CMD_ARP_TOGGLE;
         case 0x1F: //E0 code
             return CMD_ARP_FAST;
         case 0x11:
-            return CMD_ARP_SLOW;
+            return CMD_ARP_SLOW;*/
         case 0xF0:
             return KEY_END;
         case 0xE0:
@@ -195,10 +196,10 @@ void ps2_scancode_runner()
         {
             switch (key)
             {
-            case CMD_ARP_FAST:
+            /*case CMD_ARP_FAST:
                 //printf("arp fast\r\n");
                 arp_faster();
-                //ARP UP
+                //ARP UP*/
                 break;
             default:
                 break;
@@ -234,7 +235,7 @@ void ps2_scancode_runner()
             case CMD_TRANSPOSE_DOWN:
                 command_transpose_down();
                 break;
-            case CMD_ARP_TOGGLE:
+            /*case CMD_ARP_TOGGLE:
                 //printf("arp toggle\r\n");
                 flag_arpeggio = !flag_arpeggio;
                 break;
@@ -242,7 +243,7 @@ void ps2_scancode_runner()
                 //printf("arp slow\r\n");
                 arp_slower();
                 //arp slow
-                break;
+                break;*/
             default:
                 break;
             }
